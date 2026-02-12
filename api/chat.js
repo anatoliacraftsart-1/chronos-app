@@ -11,16 +11,17 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // 'gemini-1.5-flash' yerine en uyumlu isim olan 'gemini-pro' kullanıyoruz.
-        // v1beta sürümü ile en geniş uyumluluğu bu sağlar.
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+        // v1 ve gemini-1.5-flash kombinasyonu en güncel ve hatasız olanıdır
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: `Sen Tanıksız Tarih kanalının asistanısın: ${message}` }]
+                    parts: [{ text: `Sen Tanıksız Tarih kanalının asistanısın. Şu mesajı bilgece ve gizemli bir şekilde yanıtla: ${message}` }]
                 }]
             })
         });
@@ -38,9 +39,10 @@ module.exports = async (req, res) => {
             return res.status(200).json({ reply: aiReply });
         }
 
-        return res.status(500).json({ reply: 'Yanıt alınamadı.' });
+        return res.status(500).json({ reply: 'AI şu an yanıt hazırlayamadı.' });
 
     } catch (error) {
         return res.status(500).json({ reply: 'Bağlantı hatası: ' + error.message });
     }
 };
+  
