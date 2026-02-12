@@ -7,19 +7,19 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY Vercel üzerinde tanımlı değil.' });
+        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY bulunamadı.' });
     }
 
     try {
-        // Gemini 1.5 Flash (Ücretsiz ve hızlı model)
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // "v1" versiyonu ve "gemini-pro" ismi en stabil olanıdır
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: `Sen Tanıksız Tarih kanalının gizemli asistanısın. Kullanıcıya şu konuda bilgece cevap ver: ${message}` }]
+                    parts: [{ text: `Sen Tanıksız Tarih kanalının asistanısın. Kısa ve bilgece cevap ver: ${message}` }]
                 }]
             })
         });
@@ -30,9 +30,13 @@ export default async function handler(req, res) {
             return res.status(500).json({ reply: `Gemini Hatası: ${data.error.message}` });
         }
 
-        // Gemini'den gelen cevabı ayıkla
-        const aiReply = data.candidates[0].content.parts[0].text;
-        return res.status(200).json({ reply: aiReply });
+        // Cevap yolunu daha güvenli kontrol edelim
+        if (data.candidates && data.candidates[0].content) {
+            const aiReply = data.candidates[0].content.parts[0].text;
+            return res.status(200).json({ reply: aiReply });
+        } else {
+            return res.status(500).json({ reply: 'AI cevap üretemedi, lütfen tekrar dene.' });
+        }
 
     } catch (error) {
         return res.status(500).json({ reply: 'Bağlantı hatası: ' + error.message });
