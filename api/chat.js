@@ -7,12 +7,12 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY Vercel üzerinde tanımlı değil.' });
+        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY bulunamadı.' });
     }
 
     try {
-        // En güncel ve her bölgede çalışan stabil URL:
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // v1beta ve tam model yolu kullanımı (En güncel ve sorunsuz adres)
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -26,9 +26,8 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        // Hata ayıklama için daha detaylı kontrol
+        // Eğer hala hata varsa, hatanın detayını görelim
         if (data.error) {
-            console.error('Gemini Detaylı Hata:', data.error);
             return res.status(500).json({ reply: `Gemini Hatası (${data.error.code}): ${data.error.message}` });
         }
 
@@ -36,7 +35,7 @@ export default async function handler(req, res) {
             const aiReply = data.candidates[0].content.parts[0].text;
             return res.status(200).json({ reply: aiReply });
         } else {
-            return res.status(500).json({ reply: 'AI şu an cevap veremiyor, lütfen az sonra tekrar dene.' });
+            return res.status(500).json({ reply: 'AI şu an yanıt veremiyor, lütfen tekrar dene.' });
         }
 
     } catch (error) {
