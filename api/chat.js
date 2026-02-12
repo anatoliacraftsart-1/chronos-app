@@ -1,5 +1,3 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
 module.exports = async (req, res) => {
     // Sadece POST isteklerini kabul et
     if (req.method !== 'POST') {
@@ -10,11 +8,11 @@ module.exports = async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY Vercel üzerinde bulunamadı.' });
+        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY Vercel ayarlarında eksik.' });
     }
 
     try {
-        // En stabil Google API adresi
+        // Doğrudan yerleşik fetch kullanıyoruz (node-fetch gerektirmez)
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
