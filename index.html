@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronos - Tanıksız Arşiv</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Cinzel:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --deep-black: #0a0a0b;
+            --soft-gray: #1c1c1e;
+            --text-gold: #f1d592;
+        }
+
+        body {
+            background: #000;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
+
+        /* Telefon Çerçevesi */
+        .phone-frame {
+            width: 360px;
+            height: 740px;
+            background: var(--deep-black);
+            border: 8px solid #1a1a1a;
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ekranlar */
+        .screen {
+            flex: 1;
+            overflow-y: auto;
+            display: none;
+            padding: 25px;
+            padding-top: 50px;
+        }
+
+        .active-screen { display: block; }
+
+        /* AI Chat Tasarımı */
+        .chat-container { display: flex; flex-direction: column; gap: 15px; }
+        .msg { padding: 14px 18px; border-radius: 20px; font-size: 0.95rem; line-height: 1.5; max-width: 85%; }
+        .ai-msg { background: var(--soft-gray); color: #ccc; align-self: flex-start; border-left: 3px solid var(--gold); }
+        .user-msg { background: var(--gold); color: #000; align-self: flex-end; font-weight: 600; }
+
+        /* Mesaj Giriş Alanı */
+        .input-area {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: var(--deep-black);
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .input-area input {
+            flex: 1;
+            background: #1c1c1e;
+            border: 1px solid #333;
+            border-radius: 25px;
+            padding: 12px 18px;
+            color: white;
+            outline: none;
+        }
+
+        .input-area button {
+            background: var(--gold);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.2s;
+        }
+
+        /* Alt Menü (Tab Bar) */
+        .tab-bar {
+            height: 75px;
+            background: #0d0d0d;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .tab-item {
+            color: #555;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tab-item.active { color: var(--gold); }
+        .tab-item span { font-size: 1.4rem; }
+        .tab-label { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    
+    <div id="ai-screen" class="screen active-screen">
+        <div class="chat-container" id="chat-box">
+            <div class="msg ai-msg">Chronos AI'ya hoş geldin. "Tanıksız Tarih" videoları veya Anatoliacraftt dükkanındaki ürünler hakkında ne bilmek istersin?</div>
+        </div>
+    </div>
+
+    <div class="input-area" id="input-group">
+        <input type="text" id="user-input" placeholder="Bir gizemi sor...">
+        <button onclick="sendMessage()">➤</button>
+    </div>
+
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="showScreen('ai', this)">
+            <span>🏛️</span><span class="tab-label">AI</span>
+        </div>
+        <div class="tab-item" onclick="showScreen('archive', this)">
+            <span>📜</span><span class="tab-label">ARŞİV</span>
+        </div>
+        <div class="tab-item" onclick="showScreen('shop', this)">
+            <span>🛍️</span><span class="tab-label">SHOP</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showScreen(screenId, el) {
+        // ARŞİV'E TIKLANDIĞINDA DİREKT YOUTUBE'A GİT
+        if (screenId === 'archive') {
+            window.open('https://www.youtube.com/@taniksiztarih', '_blank');
+            return; 
+        }
+        
+        // SHOP'A TIKLANDIĞINDA DİREKT ETSY'E GİT (Anatoliacraftt)
+        if (screenId === 'shop') {
+            window.open('https://www.etsy.com/shop/Anatoliacraftt', '_blank');
+            return; 
+        }
+        
+        // EKRANLARI DEĞİŞTİR (Sadece AI ekranı için)
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById(screenId + '-screen').classList.add('active-screen');
+        
+        // İKONLARI GÜNCELLE
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+        if(!input.value) return;
+
+        const userText = input.value;
+        chatBox.innerHTML += `<div class="msg user-msg">${userText}</div>`;
+        input.value = "";
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // Vercel /api/chat.js dosyasına istek atar
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userText })
+            });
+            const data = await response.json();
+            chatBox.innerHTML += `<div class="msg ai-msg">${data.reply}</div>`;
+        } catch (e) {
+            chatBox.innerHTML += `<div class="msg ai-msg">Zaman tünelinde bir kopukluk oldu... (Vercel bağlantısı tamamlanınca burası canlanacak.)</div>`;
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
