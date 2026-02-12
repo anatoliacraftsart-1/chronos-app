@@ -7,38 +7,38 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY Vercel ayarlarında bulunamadı.' });
+        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY Vercel üzerinde eksik.' });
     }
 
     try {
-        // v1beta sürümünde 'gemini-pro' en kapsayıcı model ismidir
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+        // En güncel ve kabul görme ihtimali en yüksek model ismi: gemini-1.5-flash
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: `Sen Tanıksız Tarih kanalının asistanısın. Şu mesajı gizemli bir dille yanıtla: ${message}` }]
+                    parts: [{ text: `Sen Tanıksız Tarih kanalının asistanısın: ${message}` }]
                 }]
             })
         });
 
         const data = await response.json();
 
+        // Hata durumunda detayı göster
         if (data.error) {
-            // Eğer 404 verirse model ismini değiştirmemiz gerektiğini anlarız
             return res.status(data.error.code || 500).json({ 
-                reply: `Gemini Hatası (${data.error.code}): ${data.error.message}` 
+                reply: `Gemini Hatası (${data.error.code}): ${data.error.message}. Lütfen Vercel'den Redeploy yapın.` 
             });
         }
 
         if (data.candidates && data.candidates[0].content) {
             const aiReply = data.candidates[0].content.parts[0].text;
             return res.status(200).json({ reply: aiReply });
-        } else {
-            return res.status(500).json({ reply: 'AI şu an yanıt hazırlayamadı.' });
         }
+
+        return res.status(500).json({ reply: 'Yanıt alınamadı.' });
 
     } catch (error) {
         return res.status(500).json({ reply: 'Bağlantı hatası: ' + error.message });
