@@ -7,19 +7,20 @@ module.exports = async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY Vercel üzerinde eksik.' });
+        return res.status(500).json({ reply: 'Hata: GEMINI_API_KEY bulunamadı.' });
     }
 
     try {
-        // v1 yerine v1beta ve gemini-1.5-flash kullanımı en garanti yoldur
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // 'gemini-1.5-flash' yerine en uyumlu isim olan 'gemini-pro' kullanıyoruz.
+        // v1beta sürümü ile en geniş uyumluluğu bu sağlar.
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: `Sen Tanıksız Tarih kanalının asistanısın. Şu mesajı yanıtla: ${message}` }]
+                    parts: [{ text: `Sen Tanıksız Tarih kanalının asistanısın: ${message}` }]
                 }]
             })
         });
