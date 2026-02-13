@@ -2,35 +2,38 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(200).json({ reply: "Hata: GEMINI_API_KEY bulunamadı." });
+    return res.status(200).json({ reply: "Sistem Hatası: API Anahtarı bulunamadı." });
   }
 
   try {
-    // API'ye "Bana hangi modelleri kullanabileceğimi söyle" diyoruz
-    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+    // Listendeki en stabil ve yeni model: gemini-2.5-flash
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ 
+          role: "user",
+          parts: [{ text: req.body.message || "Merhaba" }] 
+        }]
+      })
+    });
+
     const data = await response.json();
 
     if (data.error) {
-      return res.status(200).json({ reply: `Sorgu Hatası: ${data.error.message}` });
+      return res.status(200).json({ reply: `API Hatası: ${data.error.message}` });
     }
 
-    // Gelen modelleri okunabilir bir liste haline getiriyoruz
-    if (data.models) {
-      const modelList = data.models
-        .map(m => m.name.replace('models/', '')) // 'models/' kısmını temizle
-        .join(', ');
-      
-      res.status(200).json({ 
-        reply: `Erişebildiğin Modeller: ${modelList}. Lütfen bu listeden birini seçelim.` 
-      });
+    if (data.candidates && data.candidates[0].content) {
+      const result = data.candidates[0].content.parts[0].text;
+      res.status(200).json({ reply: result });
     } else {
-      res.status(200).json({ reply: "Hiçbir model listelenemedi. API anahtarında bir kısıtlama olabilir." });
+      res.status(200).json({ reply: "Modelden yanıt alınamadı, lütfen tekrar deneyin." });
     }
 
   } catch (error) {
-    res.status(500).json({ reply: "Sorgulama sırasında sunucu hatası: " + error.message });
+    res.status(500).json({ reply: "Sunucu hatası: " + error.message });
   }
 }
-
