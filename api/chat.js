@@ -2,12 +2,12 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(200).json({ reply: "Sistem Hatası: API Anahtarı eksik!" });
+    return res.status(200).json({ reply: "Sistem Hatası: API Anahtarı (GEMINI_API_KEY) bulunamadı." });
   }
 
   try {
-    // Sürüm karmaşasını önlemek için v1 endpoint'i üzerinden gidiyoruz
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // ÖNEMLİ: v1beta ve gemini-1.5-flash-latest kombinasyonu şu an en kararlı olanıdır.
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -22,9 +22,9 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.error) {
-      // Eğer model bulunamazsa hata mesajında hangi modellerin mevcut olduğunu söyleyecek
+      // Eğer yine hata verirse, buradaki mesaj bize her şeyi anlatacak.
       return res.status(200).json({ 
-        reply: `API Bilgisi: ${data.error.message} (Lütfen Vercel Logs üzerinden desteklenen modelleri kontrol edin.)` 
+        reply: `API Yanıtı: ${data.error.message} (Hata Kodu: ${data.error.code})` 
       });
     }
 
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       const result = data.candidates[0].content.parts[0].text;
       res.status(200).json({ reply: result });
     } else {
-      res.status(200).json({ reply: "Bağlantı başarılı, veri bekleniyor..." });
+      res.status(200).json({ reply: "Bağlantı başarılı, ancak içerik oluşturulamadı." });
     }
 
   } catch (error) {
