@@ -1,37 +1,39 @@
 export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
 
+  if (!apiKey) return res.status(200).json({ reply: "Hata: API Anahtarı eksik." });
+
   try {
-    // En hızlı ve en çok isteğe izin veren stabil model
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Listende olduğunu kesin bildiğimiz ve en hızlı çalışan model
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ 
-          parts: [{ text: req.body.message }] 
+          role: "user",
+          parts: [{ text: req.body.message || "Merhaba" }] 
         }]
       })
     });
 
     const data = await response.json();
 
-    // Hata kontrolü
+    // Hata kontrolü (Kota veya Model hatası olup olmadığını görmek için)
     if (data.error) {
-      return res.status(200).json({ reply: `Hata: ${data.error.message}` });
+      return res.status(200).json({ 
+        reply: `Sistem Bilgisi: ${data.error.message}` 
+      });
     }
 
-    // Yanıt kontrolü
-    if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
-      const result = data.candidates[0].content.parts[0].text;
-      res.status(200).json({ reply: result });
+    if (data.candidates && data.candidates[0].content) {
+      res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
     } else {
-      // Eğer candidates boş gelirse (güvenlik filtresi vb.)
-      res.status(200).json({ reply: "İsteğin işlenemedi, lütfen farklı bir şey yaz." });
+      res.status(200).json({ reply: "Bağlantı başarılı, ancak yanıt oluşturulamadı. Lütfen tekrar deneyin." });
     }
 
   } catch (error) {
-    res.status(500).json({ reply: "Sunucu tünelinde bir kopukluk oldu." });
+    res.status(500).json({ reply: "Sunucu hatası: " + error.message });
   }
 }
