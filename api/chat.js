@@ -4,8 +4,8 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
     const { message, history } = req.body;
 
-    // EN GARANTİ URL: Sadece gemini-pro (En temel ve kararlı modeldir)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    // GOOGLE'IN EN ÇOK KABUL ETTİĞİ FORMAT: v1beta ve gemini-1.5-flash
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(url, {
@@ -13,21 +13,20 @@ export default async function handler(req, res) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [
-                    ...(history || []).map(item => ({
-                        role: item.role === "model" ? "model" : "user",
-                        parts: [{ text: item.parts[0].text }]
-                    })),
-                    { role: "user", parts: [{ text: message }] }
+                    {
+                        role: "user",
+                        parts: [{ text: message }]
+                    }
                 ]
             })
         });
 
         const data = await response.json();
 
-        // Vercel hata oranını düşürmek için hata olsa bile 200 dönüyoruz
+        // Eğer hala hata gelirse, hatanın gerçek sebebinin ne olduğunu ekranda görelim
         if (data.error) {
-            console.error("API Error:", data.error.message);
-            return res.status(200).json({ reply: "Tarih tünelinde ufak bir bakım var, lütfen birkaç saniye sonra tekrar yazar mısın?" });
+            console.error("API ERROR:", data.error.message);
+            return res.status(200).json({ reply: "Sistem Hatası: " + data.error.message });
         }
 
         if (data.candidates && data.candidates[0].content) {
@@ -35,9 +34,9 @@ export default async function handler(req, res) {
             return res.status(200).json({ reply: aiReply });
         }
 
-        return res.status(200).json({ reply: "Şu an cevap veremiyorum, lütfen tekrar sormayı dene." });
+        return res.status(200).json({ reply: "Tarihin derinliklerinde bir sorun var." });
 
     } catch (error) {
-        return res.status(200).json({ reply: "Bağlantı hatası oluştu. Lütfen sayfayı yenileyin." });
+        return res.status(200).json({ reply: "Bağlantı koptu. Lütfen tekrar dene." });
     }
 }
