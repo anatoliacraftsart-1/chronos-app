@@ -1,34 +1,37 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).json({ reply: 'Method Not Allowed' });
-    const apiKey = process.env.GEMINI_API_KEY;
-    const { message, history } = req.body;
+  if (req.method !== 'POST') {
+    return res.status(450).json({ error: 'Yalnızca POST istekleri kabul edilir' });
+  }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const { message, history } = req.body;
+  const apiKey = process.env.GEMINI_API_KEY;
 
-    const systemInstruction = "Sen Tanıksız Tarih asistanısın. Tarih konusunda uzman, nazik ve merak uyandırıcı bir dil kullanmalısın.";
+  if (!apiKey) {
+    return res.status(500).json({ reply: "Hata: API anahtarı (GEMINI_API_KEY) Vercel üzerinde tanımlanmamış." });
+  }
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [
-                    { role: "user", parts: [{ text: systemInstruction }] },
-                    { role: "model", parts: [{ text: "Anlaşıldı." }] },
-                    ...(history || []).map(item => ({
-                        role: item.role === "model" ? "model" : "user",
-                        parts: [{ text: item.parts[0].text }]
-                    })),
-                    { role: "user", parts: [{ text: message }] }
-                ]
-            })
-        });
+  try {
+    // Google Gemini API endpoint
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-        const data = await response.json();
-        const aiReply = data.candidates[0].content.parts[0].text;
-        return res.status(200).json({ reply: aiReply });
-    } catch (error) {
-        return res.status(200).json({ reply: "Bağlantı hatası oluştu." });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [...(history || []), { role: "user", parts: [{ text: message }] }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.candidates && data.candidates[0].content) {
+      res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
+    } else {
+      console.error("API Hatası:", data);
+      res.status(500).json({ reply: "API'den boş yanıt döndü. Lütfen anahtarınızı kontrol edin." });
     }
+  } catch (error) {
+    console.error("Bağlantı Hatası:", error);
+    res.status(500).json({ reply: "Sunucu bağlantısı koptu. Lütfen internetinizi kontrol edin." });
+  }
 }
-    
