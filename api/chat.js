@@ -2,40 +2,35 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(200).json({ reply: "Sistem Hatası: API Anahtarı (GEMINI_API_KEY) bulunamadı." });
+    return res.status(200).json({ reply: "Hata: GEMINI_API_KEY bulunamadı." });
   }
 
   try {
-    // ÖNEMLİ: v1beta ve gemini-1.5-flash-latest kombinasyonu şu an en kararlı olanıdır.
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    // API'ye "Bana hangi modelleri kullanabileceğimi söyle" diyoruz
+    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ 
-          parts: [{ text: req.body.message || "Merhaba" }] 
-        }]
-      })
-    });
-
+    const response = await fetch(url);
     const data = await response.json();
 
     if (data.error) {
-      // Eğer yine hata verirse, buradaki mesaj bize her şeyi anlatacak.
-      return res.status(200).json({ 
-        reply: `API Yanıtı: ${data.error.message} (Hata Kodu: ${data.error.code})` 
-      });
+      return res.status(200).json({ reply: `Sorgu Hatası: ${data.error.message}` });
     }
 
-    if (data.candidates && data.candidates[0].content) {
-      const result = data.candidates[0].content.parts[0].text;
-      res.status(200).json({ reply: result });
+    // Gelen modelleri okunabilir bir liste haline getiriyoruz
+    if (data.models) {
+      const modelList = data.models
+        .map(m => m.name.replace('models/', '')) // 'models/' kısmını temizle
+        .join(', ');
+      
+      res.status(200).json({ 
+        reply: `Erişebildiğin Modeller: ${modelList}. Lütfen bu listeden birini seçelim.` 
+      });
     } else {
-      res.status(200).json({ reply: "Bağlantı başarılı, ancak içerik oluşturulamadı." });
+      res.status(200).json({ reply: "Hiçbir model listelenemedi. API anahtarında bir kısıtlama olabilir." });
     }
 
   } catch (error) {
-    res.status(500).json({ reply: "Sunucu hatası: " + error.message });
+    res.status(500).json({ reply: "Sorgulama sırasında sunucu hatası: " + error.message });
   }
 }
+
