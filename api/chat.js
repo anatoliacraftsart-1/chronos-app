@@ -1,27 +1,38 @@
 export default async function handler(req, res) {
+    if (req.method !== 'POST') return res.status(405).json({ reply: 'Yalnızca POST kabul edilir.' });
+
     const apiKey = process.env.GEMINI_API_KEY;
-    
-    // Bu URL senin anahtarına açık olan tüm modelleri listeler
-    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+    const { message } = req.body;
+
+    // LİSTENDEN SEÇİLEN GERÇEK MODEL: gemini-2.5-flash
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: message }]
+                }]
+            })
+        });
+
         const data = await response.json();
 
         if (data.error) {
-            return res.status(200).json({ reply: "API Anahtarı Geçersiz: " + data.error.message });
+            return res.status(200).json({ 
+                reply: "Model eşleşme hatası: " + data.error.message 
+            });
         }
 
-        // Modelleri bul ve isimlerini birleştir
-        const modelList = data.models
-            .map(m => m.name.replace('models/', ''))
-            .join(', ');
+        if (data.candidates && data.candidates[0].content) {
+            return res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
+        }
 
-        return res.status(200).json({ 
-            reply: "Senin için uygun modeller şunlar: " + modelList + ". Lütfen bu listeyi bana gönder." 
-        });
+        return res.status(200).json({ reply: "Tarih tüneli şu an boş dönüyor." });
 
     } catch (error) {
-        return res.status(200).json({ reply: "Liste alınamadı: " + error.message });
+        return res.status(200).json({ reply: "Bağlantı hatası: " + error.message });
     }
 }
