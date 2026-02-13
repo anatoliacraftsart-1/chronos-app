@@ -1,37 +1,24 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(450).json({ error: 'Yalnızca POST istekleri kabul edilir' });
-  }
-
-  const { message, history } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ reply: "Hata: API anahtarı (GEMINI_API_KEY) Vercel üzerinde tanımlanmamış." });
+    return res.status(200).json({ reply: "Sistem Notu: API Anahtarı eksik!" });
   }
 
   try {
-    // Google Gemini API endpoint
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const response = await fetch(url, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [...(history || []), { role: "user", parts: [{ text: message }] }]
+        contents: [{ parts: [{ text: req.body.message }] }]
       })
     });
 
     const data = await response.json();
-
-    if (data.candidates && data.candidates[0].content) {
-      res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
-    } else {
-      console.error("API Hatası:", data);
-      res.status(500).json({ reply: "API'den boş yanıt döndü. Lütfen anahtarınızı kontrol edin." });
-    }
+    const result = data.candidates?.[0]?.content?.parts?.[0]?.text || "Cevap üretilemedi.";
+    
+    res.status(200).json({ reply: result });
   } catch (error) {
-    console.error("Bağlantı Hatası:", error);
-    res.status(500).json({ reply: "Sunucu bağlantısı koptu. Lütfen internetinizi kontrol edin." });
+    res.status(500).json({ reply: "Bağlantı sırasında bir sorun oluştu." });
   }
 }
