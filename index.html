@@ -11,16 +11,53 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2232/2232688.png">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
         body {
             background-color: #0d0d0d;
             color: #e0e0e0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden; /* Dış ekranın kaymasını engeller */
+            overflow: hidden;
+        }
+
+        /* Üst Menü */
+        #top-bar {
+            background-color: #1c1c1e;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            /* iPhone çentik uyumu */
+            padding-top: calc(10px + env(safe-area-inset-top)); 
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: #b8860b; /* Antik Altın */
+            text-decoration: none;
+            font-size: 22px;
+            transition: transform 0.2s;
+        }
+
+        .social-links a:active {
+            transform: scale(1.2);
+        }
+
+        .logo-text {
+            font-weight: bold;
+            color: #b8860b;
+            font-size: 18px;
+            letter-spacing: 1px;
         }
 
         #chat-container {
@@ -30,6 +67,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            padding-bottom: 30px;
         }
 
         .message {
@@ -37,33 +75,31 @@
             padding: 12px 16px;
             border-radius: 15px;
             line-height: 1.5;
-            word-wrap: break-word;
             font-size: 15px;
         }
 
         .user-message {
             align-self: flex-end;
             background-color: #2c2c2e;
-            color: #ffffff;
+            color: white;
             border-bottom-right-radius: 2px;
         }
 
         .ai-message {
             align-self: flex-start;
             background-color: #1c1c1e;
-            color: #d1d1d6;
-            border-left: 3px solid #b8860b; /* Antik altın rengi */
+            border-left: 3px solid #b8860b;
             border-bottom-left-radius: 2px;
         }
 
-        /* Form ve Input Alanı */
         #input-area {
             background-color: #1c1c1e;
             padding: 15px;
             display: flex;
             gap: 10px;
             border-top: 1px solid #333;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* iPhone alt çentik uyumu */
+            /* iPhone alt bar uyumu */
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
         }
 
         input {
@@ -73,9 +109,8 @@
             color: white;
             padding: 12px;
             border-radius: 25px;
+            font-size: 16px !important; /* Zoom engelleme için şart */
             outline: none;
-            /* ÖNEMLİ: Mobil klavyede zoom yapmaması için font-size en az 16px olmalı */
-            font-size: 16px !important; 
         }
 
         button {
@@ -86,22 +121,29 @@
             border-radius: 25px;
             font-weight: bold;
             cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        button:active {
-            opacity: 0.7;
         }
     </style>
 </head>
 <body>
 
+    <div id="top-bar">
+        <div class="logo-text">CHRONOS</div>
+        <div class="social-links">
+            <a href="https://www.youtube.com/@taniksiztarih" target="_blank" title="YouTube">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://www.etsy.com/shop/anatoliacrafts" target="_blank" title="Etsy">
+                <i class="fab fa-etsy"></i>
+            </a>
+        </div>
+    </div>
+
     <div id="chat-container">
-        <div class="message ai-message">Hoş geldin fani. Tarihin tozlu sayfalarını aralamaya hazır mısın?</div>
+        <div class="message ai-message">Chronos hazır. AnatoliaCrafts'tan bir eser mi yoksa Tanıksız Tarih'ten bir sır mı sormak istersin?</div>
     </div>
 
     <form id="input-area" onsubmit="sendMessage(event)">
-        <input type="text" id="userInput" placeholder="Sorunu buraya bırak..." autocomplete="off">
+        <input type="text" id="userInput" placeholder="Tarihe fısılda..." autocomplete="off">
         <button type="submit">Gönder</button>
     </form>
 
@@ -109,14 +151,11 @@
         let chatHistory = [];
 
         async function sendMessage(event) {
-            // Formun sayfayı yenilemesini engeller (Enter tuşu kullanımı için kritik)
             if(event) event.preventDefault();
-
             const inputField = document.getElementById('userInput');
             const message = inputField.value.trim();
             if (!message) return;
 
-            // Kullanıcı mesajını ekrana bas
             appendMessage(message, 'user-message');
             inputField.value = '';
 
@@ -126,19 +165,14 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message, history: chatHistory })
                 });
-
                 const data = await response.json();
-                
                 if (data.reply) {
                     appendMessage(data.reply, 'ai-message');
-                    // Hafıza için geçmişi güncelle
                     chatHistory.push({ role: "user", parts: [{ text: message }] });
                     chatHistory.push({ role: "model", parts: [{ text: data.reply }] });
-                } else {
-                    appendMessage("Bir tıkanıklık oldu fani, tekrar dene.", 'ai-message');
                 }
             } catch (error) {
-                appendMessage("Bağlantı koptu...", 'ai-message');
+                appendMessage("Zaman tüneli şu an kapalı, tekrar dene.", 'ai-message');
             }
         }
 
@@ -148,16 +182,15 @@
             msgDiv.className = `message ${className}`;
             msgDiv.innerText = text;
             container.appendChild(msgDiv);
-            
-            // Otomatik aşağı kaydır
             container.scrollTop = container.scrollHeight;
         }
 
-        // PWA Service Worker Kaydı
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
         }
     </script>
 </body>
 </html>
+
+
 
