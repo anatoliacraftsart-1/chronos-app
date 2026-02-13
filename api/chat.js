@@ -1,9 +1,10 @@
 export default async function handler(req, res) {
+    // Vercel'in yeni sürümlerinde fetch zaten tanımlıdır, extra import'a gerek kalmayabilir
     const { message, history } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // ÖNEMLİ: Linkin başında ve sonunda ` (backtick) işareti olduğundan emin ol
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKey}`;
+    // En kararlı model ismi: gemini-1.5-flash
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(url, {
@@ -20,9 +21,13 @@ export default async function handler(req, res) {
             return res.status(500).json({ reply: "API Hatası: " + data.error.message });
         }
 
-        const reply = data.candidates[0].content.parts[0].text;
-        res.status(200).json({ reply });
+        if (data.candidates && data.candidates[0].content) {
+            const reply = data.candidates[0].content.parts[0].text;
+            res.status(200).json({ reply });
+        } else {
+            res.status(500).json({ reply: "Asistan cevap üretemedi, lütfen tekrar dene." });
+        }
     } catch (error) {
-        res.status(500).json({ reply: "Bağlantı tünelinde bir sorun oluştu." });
+        res.status(500).json({ reply: "Bağlantı hatası: " + error.message });
     }
 }
