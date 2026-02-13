@@ -6,8 +6,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Endpoint'i v1 sürümüne ve model ismini en kararlı hale getiriyoruz
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Model ismini gemini-pro olarak güncelledik (v1beta endpoint'i ile en uyumlu olan)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -22,7 +22,6 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.error) {
-      // Hata devam ederse buradaki detay her şeyi açıklayacak
       return res.status(200).json({ reply: `API Detay Hatası: ${data.error.message} (Kod: ${data.error.code})` });
     }
 
@@ -30,12 +29,10 @@ export default async function handler(req, res) {
       const result = data.candidates[0].content.parts[0].text;
       res.status(200).json({ reply: result });
     } else {
-      res.status(200).json({ reply: "Bağlantı başarılı ancak içerik üretilemedi." });
+      res.status(200).json({ reply: "Bağlantı başarılı ancak model yanıt vermedi." });
     }
 
   } catch (error) {
     res.status(500).json({ reply: "Sunucu hatası: " + error.message });
   }
 }
-
- 
