@@ -41,6 +41,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-glow);
+            z-index: 10;
         }
 
         .brand h1 { 
@@ -50,16 +51,12 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .social-links { display: flex; gap: 20px; }
-        .fa-youtube { color: #FF0000; font-size: 28px; }
-        .fa-etsy { color: #F1641E; font-size: 22px; }
-
         #chat-container {
             flex: 1; overflow-y: auto; padding: 30px;
-            display: flex; flex-direction: column; gap: 30px;
+            display: flex; flex-direction: column; gap: 25px;
         }
 
-        .message-row { display: flex; gap: 15px; max-width: 85%; animation: fadeIn 0.4s ease; }
+        .message-row { display: flex; gap: 15px; max-width: 85%; animation: fadeIn 0.3s ease; }
         .ai-row { align-self: flex-start; }
         .user-row { align-self: flex-end; flex-direction: row-reverse; }
 
@@ -68,27 +65,25 @@
             border: 2px solid var(--border-glow); background-size: cover;
             flex-shrink: 0;
         }
-
         .ai-avatar { background-image: url('https://img.icons8.com/ios-filled/100/00f2ff/artificial-intelligence.png'); background-color: #000; }
         .user-avatar { background-image: url('https://img.icons8.com/ios-filled/100/ffffff/user-male-circle.png'); background-color: #1a1a1a; }
 
         .message-content { display: flex; flex-direction: column; gap: 8px; }
-
-        .message { padding: 16px 22px; border-radius: 18px; font-size: 0.98rem; line-height: 1.6; backdrop-filter: blur(10px); }
+        .message { padding: 16px 22px; border-radius: 18px; font-size: 0.98rem; line-height: 1.6; backdrop-filter: blur(10px); word-wrap: break-word; }
         .ai-message { background: var(--glass-ai); border: 1px solid var(--border-glow); border-top-left-radius: 2px; }
         .user-message { background: var(--glass-user); border: 1px solid rgba(0, 242, 255, 0.4); border-top-right-radius: 2px; }
 
         .image-gallery { display: flex; gap: 12px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .gallery-img { width: 140px; height: 140px; border-radius: 12px; border: 1px solid var(--neon-blue); object-fit: cover; }
+        .gallery-img { width: 140px; height: 140px; border-radius: 12px; border: 1px solid var(--neon-blue); object-fit: cover; flex-shrink: 0; }
 
         .input-area { padding: 30px; background: rgba(0,0,0,0.5); }
         .input-wrapper {
             background: rgba(255,255,255,0.03); border: 1px solid var(--border-glow);
             border-radius: 15px; display: flex; padding: 10px 25px; align-items: center;
         }
-
         input { flex: 1; background: transparent; border: none; color: white; padding: 12px; outline: none; font-size: 1.1rem; }
-        button { background: none; border: none; color: var(--neon-blue); cursor: pointer; font-size: 1.6rem; }
+        button { background: none; border: none; color: var(--neon-blue); cursor: pointer; font-size: 1.6rem; transition: 0.2s; }
+        button:hover { transform: scale(1.1); filter: brightness(1.2); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
     </style>
@@ -97,9 +92,9 @@
 
     <header>
         <div class="brand"><h1>TANIKSIZ TARİH</h1></div>
-        <div class="social-links">
-            <a href="https://youtube.com/@taniksiztarih" target="_blank"><i class="fab fa-youtube"></i></a>
-            <a href="https://etsy.com/shop/anatoliacrafts" target="_blank"><i class="fab fa-etsy"></i></a>
+        <div style="display: flex; gap: 20px;">
+            <a href="https://youtube.com/@taniksiztarih" target="_blank" style="color: #FF0000; font-size: 26px;"><i class="fab fa-youtube"></i></a>
+            <a href="https://etsy.com/shop/anatoliacrafts" target="_blank" style="color: #F1641E; font-size: 22px;"><i class="fab fa-etsy"></i></a>
         </div>
     </header>
 
@@ -107,62 +102,25 @@
         <div class="message-row ai-row">
             <div class="avatar ai-avatar"></div>
             <div class="message-content">
-                <div class="message ai-message">Bağlantı başarılı. Tarihsel veri akışına başlayabiliriz. 🛰️</div>
+                <div class="message ai-message">Sistem çevrimiçi. Tarihsel veri akışı için komutunuzu bekliyorum.</div>
             </div>
         </div>
     </div>
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="user-input" placeholder="Tarihe bir komut girin..." onkeypress="if(event.key==='Enter') sendMessage()">
-            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            <input type="text" id="user-input" placeholder="Komut girin..." autocomplete="off">
+            <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
         let chatHistory = [];
 
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if(!text) return;
-
-            appendMessage('user', text);
-            input.value = '';
-
-            const loadId = "L-" + Date.now();
-            appendMessage('ai', "Sistem taranıyor...", loadId);
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, history: chatHistory })
-                });
-                
-                if (!response.ok) throw new Error("API Hatası");
-
-                const data = await response.json();
-                const loadElement = document.getElementById(loadId);
-                if (loadElement) {
-                    loadElement.innerText = data.reply;
-                    loadElement.removeAttribute('id');
-                }
-
-                // Görsel kelimeleri kontrolü
-                const isImg = ["görsel", "resim", "çiz", "oluştur", "fotoğraf"].some(w => text.toLowerCase().includes(w));
-                if (isImg) { addGallery(text); }
-
-                chatHistory.push({role: "user", parts: [{text: text}]});
-                chatHistory.push({role: "model", parts: [{text: data.reply}]});
-            } catch (err) {
-                const loadElement = document.getElementById(loadId);
-                if (loadElement) loadElement.innerText = "Bağlantı hatası: Sunucuya ulaşılamıyor.";
-            }
-        }
-
-        function appendMessage(role, text, id = "") {
-            const container = document.getElementById('chat-container');
+        function appendMessage(role, text) {
             const row = document.createElement('div');
             row.className = `message-row ${role}-row`;
             
@@ -174,24 +132,19 @@
             
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${role}-message`;
-            if(id) msgDiv.id = id;
             msgDiv.innerText = text;
             
             content.appendChild(msgDiv);
             row.appendChild(avatar);
             row.appendChild(content);
-            container.appendChild(row);
-            container.scrollTop = container.scrollHeight;
+            chatContainer.appendChild(row);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return msgDiv; // Sonradan içeriği değiştirmek için geri döndürür
         }
 
-        function addGallery(prompt) {
-            const container = document.getElementById('chat-container');
-            const rows = container.querySelectorAll('.ai-row');
-            const lastContent = rows[rows.length - 1].querySelector('.message-content');
-            
+        function addGallery(prompt, targetDiv) {
             const gallery = document.createElement('div');
             gallery.className = 'image-gallery';
-            
             for(let i=0; i<3; i++) {
                 const img = document.createElement('img');
                 img.className = 'gallery-img';
@@ -199,10 +152,45 @@
                 img.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + " cinematic historical 4k") }?seed=${seed}&nologo=true`;
                 gallery.appendChild(img);
             }
-            
-            lastContent.appendChild(gallery);
-            container.scrollTop = container.scrollHeight;
+            targetDiv.parentElement.appendChild(gallery);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
+
+        async function handleSend() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            appendMessage('user', message);
+            userInput.value = '';
+
+            const aiMsgDiv = appendMessage('ai', "Veri tüneli taranıyor...");
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, history: chatHistory })
+                });
+
+                if (!response.ok) throw new Error();
+
+                const data = await response.json();
+                aiMsgDiv.innerText = data.reply;
+
+                const isImg = ["görsel", "resim", "çiz", "oluştur"].some(w => message.toLowerCase().includes(w));
+                if (isImg) addGallery(message, aiMsgDiv);
+
+                chatHistory.push({ role: "user", parts: [{ text: message }] });
+                chatHistory.push({ role: "model", parts: [{ text: data.reply }] });
+
+            } catch (err) {
+                aiMsgDiv.innerText = "Bağlantı hatası: Lütfen API anahtarını ve internetinizi kontrol edin.";
+                aiMsgDiv.style.color = "#ff4d4d";
+            }
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
     </script>
 </body>
 </html>
