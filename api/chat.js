@@ -4,8 +4,9 @@ export default async function handler(req, res) {
     const { message, history } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // SADE VE NET: v1beta/models/gemini-pro
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    // ÇALIŞAN VE KARARLI MODEL: v1/gemini-1.5-flash
+    // Bu model hem hızlıdır hem de 'Not Found' hatası vermez.
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(url, {
@@ -15,28 +16,31 @@ export default async function handler(req, res) {
                 contents: [
                     ...(history || []).map(item => ({
                         role: item.role === "model" ? "model" : "user",
-                        parts: [{ text: typeof item.parts === 'string' ? item.parts : item.parts[0].text }]
+                        parts: [{ text: item.parts[0].text }]
                     })),
                     { role: "user", parts: [{ text: message }] }
-                ]
+                ],
+                // Hız için eklenen yapılandırma:
+                generationConfig: {
+                    maxOutputTokens: 500, // Cevabı çok uzatmayıp hızı artırır
+                    temperature: 0.7      // Daha doğal ama hızlı cevaplar
+                }
             })
         });
 
         const data = await response.json();
 
-        // Eğer hala "Bulunamadı" diyorsa hatayı detaylıca yakala
         if (data.error) {
-            console.error("KRİTİK HATA:", data.error.message);
-            // Hata mesajı "not found" ise alternatifi dene
-            return res.status(200).json({ reply: `API Modeli Bağlanamadı. Lütfen Google AI Studio'dan API Key'inizi ve model yetkinizi kontrol edin. Hata: ${data.error.message}` });
+            console.error("API Hatası:", data.error.message);
+            return res.status(500).json({ reply: "Sistem geri yükleniyor, lütfen tekrar dene." });
         }
 
         if (data.candidates && data.candidates[0].content) {
             res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
         } else {
-            res.status(200).json({ reply: "Cevap formatı uyuşmadı." });
+            res.status(500).json({ reply: "Cevap üretilemedi." });
         }
     } catch (error) {
-        res.status(500).json({ reply: "Bağlantı koptu: " + error.message });
+        res.status(500).json({ reply: "Bağlantı hatası: " + error.message });
     }
 }
