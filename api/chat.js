@@ -6,8 +6,8 @@ export default async function handler(req, res) {
     const { message, history } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // En güncel ve doğru URL yapısı budur:
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // v1 sürümü + flash-8b-latest kombinasyonu en yüksek başarı oranına sahiptir.
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-8b-latest:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(url, {
@@ -15,9 +15,8 @@ export default async function handler(req, res) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [
-                    // Geçmiş mesajları düzgün formatta gönderiyoruz
                     ...(history || []).map(item => ({
-                        role: item.role,
+                        role: item.role === "model" ? "model" : "user",
                         parts: item.parts
                     })),
                     { role: "user", parts: [{ text: message }] }
@@ -27,17 +26,17 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         
-        // Google'dan gelen hata mesajını doğrudan yakala
+        // Google'dan gelen hata mesajını loglarda görebilmek için:
         if (data.error) {
-            console.error("Google API Hatası:", data.error.message);
-            return res.status(500).json({ reply: "API Hatası: " + data.error.message });
+            console.error("Gemini Error:", data.error.message);
+            return res.status(data.error.code || 500).json({ reply: "API Hatası: " + data.error.message });
         }
 
         if (data.candidates && data.candidates.length > 0) {
             const reply = data.candidates[0].content.parts[0].text;
             res.status(200).json({ reply });
         } else {
-            res.status(500).json({ reply: "Model cevap dönmedi, içerik filtrelenmiş olabilir." });
+            res.status(500).json({ reply: "Cevap üretilemedi, lütfen tekrar deneyin." });
         }
     } catch (error) {
         res.status(500).json({ reply: "Bağlantı hatası: " + error.message });
