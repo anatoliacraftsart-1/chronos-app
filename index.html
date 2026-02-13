@@ -109,6 +109,9 @@
         .tab-item span { font-size: 1.4rem; }
         .tab-label { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
     </style>
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
 
@@ -186,6 +189,10 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 </script>
-
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
 </body>
 </html>
