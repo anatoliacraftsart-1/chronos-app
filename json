@@ -1,0 +1,17 @@
+{
+  "name": "Tanıksız Tarih Asistanı",
+  "short_name": "Chronos",
+  "description": "Tarihin derinliklerinden gelen bilge asistan.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2232/2232688.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
