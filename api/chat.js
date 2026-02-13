@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   try {
     // 'latest' takısı, o anki en stabil ve kotası en yüksek modeli otomatik seçer.
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent?key=${apiKey}`;;
 
     const response = await fetch(url, {
       method: 'POST',
