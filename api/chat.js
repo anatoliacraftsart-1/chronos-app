@@ -1,13 +1,11 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).json({ reply: 'Method Not Allowed' });
-
-    const apiKey = process.env.GEMINI_API_KEY;
     const { message, history } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    // KİMLİK: Görsel oluşturma yeteneğini buraya ekliyoruz
+    const systemInstruction = "Sen Tanıksız Tarih asistanısın. Eğer kullanıcı bir savaş veya tarihi olay görseli/resmi isterse, cevabının en sonuna tam olarak şu formatta ekle: [IMAGE: sahne açıklaması]. Örnek: [IMAGE: Roma lejyonları Galya savaşında]";
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-    // Asistanın kişiliğini burada tanımlıyoruz
-    const systemInstruction = "Sen 'Tanıksız Tarih' projesinin yapay zeka asistanısın. AnatoliaCrafts tarafından geliştirildin. Tarih konusunda uzman, nazik ve merak uyandırıcı bir dil kullanmalısın.";
 
     try {
         const response = await fetch(url, {
@@ -16,7 +14,7 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 contents: [
                     { role: "user", parts: [{ text: systemInstruction }] },
-                    { role: "model", parts: [{ text: "Anlaşıldı, Tanıksız Tarih asistanı olarak görevime hazırım." }] },
+                    { role: "model", parts: [{ text: "Anlaşıldı." }] },
                     ...(history || []).map(item => ({
                         role: item.role === "model" ? "model" : "user",
                         parts: [{ text: item.parts[0].text }]
@@ -27,14 +25,10 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
+        const aiReply = data.candidates[0].content.parts[0].text;
 
-        if (data.candidates && data.candidates[0].content) {
-            return res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
-        }
-
-        return res.status(200).json({ reply: "Tarihin tozlu sayfaları arasında bir bağlantı sorunu oldu, lütfen tekrar dener misin?" });
-
+        return res.status(200).json({ reply: aiReply });
     } catch (error) {
-        return res.status(200).json({ reply: "Bağlantı hatası: " + error.message });
+        return res.status(200).json({ reply: "Bağlantı hatası." });
     }
 }
