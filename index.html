@@ -9,10 +9,13 @@
     
     <style>
         :root {
-            --bg-dark: #020508;
-            --bg-gradient: radial-gradient(circle at center, #0a192f 0%, #020508 100%);
-            --accent: #d4af37;
-            --glass: rgba(255, 255, 255, 0.03);
+            --bg-dark: #02060c;
+            /* Görseldeki o lacivert-siyah derinlik */
+            --bg-gradient: radial-gradient(circle at center, #0a1d37 0%, #02060c 100%);
+            --accent: #00d2ff; /* Görseldeki turkuaz/mavi parlamalar için */
+            --gold: #d4af37;  /* Tarihi doku için altın rengi */
+            --glass-ai: rgba(0, 210, 255, 0.05);
+            --glass-user: rgba(255, 255, 255, 0.05);
         }
 
         body {
@@ -27,72 +30,105 @@
             overflow: hidden;
         }
 
-        /* Header - Logo Kaldırıldı, Sadece Yazı */
+        /* Arka plana fütüristik şematik doku ekleme */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); 
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        /* Görseldeki o parlayan dairesel şemayı simüle eden element */
+        .bg-overlay {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(0, 210, 255, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
         header {
-            padding: 15px 25px;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(20px);
+            padding: 18px 30px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--accent);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.7);
+            border-bottom: 1px solid rgba(0, 210, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
         }
 
         .brand h1 { 
-            margin: 0; 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 1.3rem; 
-            letter-spacing: 2px; 
-            color: #fff;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            margin: 0; font-family: 'Orbitron', sans-serif; 
+            font-size: 1.3rem; letter-spacing: 3px; 
+            color: #fff; text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .social-links { display: flex; gap: 20px; align-items: center; }
-        .fa-youtube { color: #FF0000; font-size: 28px; }
-        .fa-etsy { color: #F1641E; font-size: 24px; }
+        .fa-youtube { color: #FF0000; font-size: 26px; }
+        .fa-etsy { color: #F1641E; font-size: 22px; }
 
-        /* Sohbet Alanı - Yıldız Tozu Geri Geldi */
         #chat-container {
             flex: 1; overflow-y: auto; padding: 25px;
-            display: flex; flex-direction: column; gap: 20px;
-            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            display: flex; flex-direction: column; gap: 25px;
+            position: relative;
         }
 
+        /* Sohbet Balonları - Görseldeki gibi şeffaf ve köşeli-oval */
         .message {
-            max-width: 85%; padding: 15px 20px; border-radius: 18px;
-            line-height: 1.6; font-size: 0.95rem; position: relative;
+            max-width: 80%; padding: 16px 22px; 
+            font-size: 0.95rem; line-height: 1.6;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
         .user-message {
-            align-self: flex-end; background: #16212c;
+            align-self: flex-end;
+            background: var(--glass-user);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom-right-radius: 4px;
+            border-radius: 20px 20px 2px 20px;
+            color: #fff;
         }
 
         .ai-message {
-            align-self: flex-start; background: var(--glass);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-bottom-left-radius: 4px;
-            backdrop-filter: blur(5px);
+            align-self: flex-start;
+            background: var(--glass-ai);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 20px 20px 20px 2px;
+            box-shadow: inset 0 0 15px rgba(0, 210, 255, 0.05);
+            color: #f0faff;
         }
 
-        /* Üretilen Görsel Stili */
+        /* Görseldeki parlayan neon çizgiler için efekt */
+        .ai-message::after {
+            content: "";
+            position: absolute;
+            bottom: 0; left: 0; width: 30px; height: 1px;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
         .gen-image {
-            width: 100%; max-width: 500px; border-radius: 12px;
-            margin-top: 15px; border: 2px solid var(--accent);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            display: block;
+            width: 100%; max-width: 450px; border-radius: 12px;
+            margin-top: 15px; border: 1px solid rgba(0, 210, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
         }
 
-        /* Giriş Alanı */
-        .input-area { padding: 20px; background: rgba(0, 0, 0, 0.7); }
+        /* Giriş Alanı - Fütüristik Kapsül */
+        .input-area { padding: 25px; background: rgba(0, 0, 0, 0.5); }
         .input-wrapper {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 30px; display: flex;
-            padding: 6px 18px; align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 15px; display: flex;
+            padding: 8px 20px; align-items: center;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.1);
         }
 
         input {
@@ -104,6 +140,7 @@
     </style>
 </head>
 <body>
+    <div class="bg-overlay"></div>
 
     <header>
         <div class="brand">
@@ -116,58 +153,43 @@
     </header>
 
     <div id="chat-container">
-        <div class="message ai-message">Tekrar hoş geldin! Tarih tünelinde yolculuğa devam edelim mi? "Savaş görseli çiz" diyebilirsin. ⚔️🏛️</div>
+        <div class="message ai-message">Sistem aktif. Tarihin derinliklerine inmeye hazır mısın? 🛰️🏛️</div>
     </div>
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="user-input" placeholder="Bir soru sor veya görsel iste..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <input type="text" id="user-input" placeholder="Komut girin veya soru sorun..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <script>
+        // ... (Aynı JavaScript mantığı devam ediyor, sendMessage ve createImage fonksiyonlarını buraya ekle) ...
         let chatHistory = [];
-
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const userText = input.value.trim();
             if(!userText) return;
-
             appendMessage('user', userText);
             input.value = '';
-
             const loadingId = "load-" + Date.now();
-            appendMessage('ai', "Zaman tüneli taranıyor...", loadingId);
-
-            // Görsel İstek Kontrolü
+            appendMessage('ai', "Veri tabanı taranıyor...", loadingId);
             const words = ["görsel", "resim", "çiz", "fotoğraf", "göster", "image", "oluştur"];
             const isImage = words.some(w => userText.toLowerCase().includes(w));
-
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: userText, history: chatHistory })
                 });
-                
                 const data = await response.json();
                 document.getElementById(loadingId).remove();
-
                 appendMessage('ai', data.reply);
-
-                if (isImage) {
-                    createImage(userText);
-                }
-
+                if (isImage) { createImage(userText); }
                 chatHistory.push({role: "user", parts: [{text: userText}]});
                 chatHistory.push({role: "model", parts: [{text: data.reply}]});
-
-            } catch (err) {
-                document.getElementById(loadingId).innerText = "Hata oluştu.";
-            }
+            } catch (err) { document.getElementById(loadingId).innerText = "Sistem hatası."; }
         }
-
         function appendMessage(role, text, id = "") {
             const container = document.getElementById('chat-container');
             const div = document.createElement('div');
@@ -177,14 +199,12 @@
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
-
         function createImage(promptText) {
             const container = document.getElementById('chat-container');
             const img = document.createElement('img');
             img.className = 'gen-image';
-            const enhancedPrompt = encodeURIComponent("historical, cinematic, " + promptText);
-            const seed = Math.floor(Math.random() * 100000);
-            img.src = `https://image.pollinations.ai/prompt/${enhancedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}`;
+            const enhancedPrompt = encodeURIComponent("historical, high tech cinematic, " + promptText);
+            img.src = `https://image.pollinations.ai/prompt/${enhancedPrompt}?width=1024&height=1024&nologo=true`;
             img.onload = () => container.scrollTop = container.scrollHeight;
             container.appendChild(img);
         }
