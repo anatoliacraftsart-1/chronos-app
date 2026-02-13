@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Chronos - Tanıksız Tarih</title>
+    <title>Tanıksız Tarih Asistanı</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#121212">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2232/2232688.png">
@@ -14,10 +14,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+        :root {
+            --gold: #c5a059;
+            --dark-bg: #121212;
+            --chat-bg: #1a1a1a;
+            --user-bubble: #2a2a2a;
+        }
+
         body {
-            background-color: #0d0d0d;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark-bg);
+            color: #f0f0f0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -25,126 +32,141 @@
             overflow: hidden;
         }
 
-        /* Üst Menü */
+        /* Üst Menü - Daha Minimal */
         #top-bar {
-            background-color: #1c1c1e;
-            padding: 10px 20px;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #333;
-            /* iPhone çentik uyumu */
-            padding-top: calc(10px + env(safe-area-inset-top)); 
-        }
-
-        .social-links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .social-links a {
-            color: #b8860b; /* Antik Altın */
-            text-decoration: none;
-            font-size: 22px;
-            transition: transform 0.2s;
-        }
-
-        .social-links a:active {
-            transform: scale(1.2);
+            padding-top: calc(15px + env(safe-area-inset-top)); 
         }
 
         .logo-text {
-            font-weight: bold;
-            color: #b8860b;
-            font-size: 18px;
-            letter-spacing: 1px;
+            font-weight: 800;
+            color: var(--gold);
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
+        .social-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 20px;
+            margin-left: 15px;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover { color: var(--gold); }
+
+        /* Sohbet Alanı - Daha Yumuşak Balonlar */
         #chat-container {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            padding-bottom: 30px;
+            gap: 12px;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #121212 100%);
         }
 
         .message {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 15px;
-            line-height: 1.5;
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            line-height: 1.6;
             font-size: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .user-message {
             align-self: flex-end;
-            background-color: #2c2c2e;
+            background-color: var(--user-bubble);
             color: white;
-            border-bottom-right-radius: 2px;
+            border-bottom-right-radius: 4px;
         }
 
         .ai-message {
             align-self: flex-start;
-            background-color: #1c1c1e;
-            border-left: 3px solid #b8860b;
-            border-bottom-left-radius: 2px;
+            background-color: var(--chat-bg);
+            border: 1px solid #333;
+            border-bottom-left-radius: 4px;
+            position: relative;
         }
 
+        .ai-message::before {
+            content: "📜";
+            position: absolute;
+            left: -25px;
+            bottom: 5px;
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        /* Giriş Alanı - Daha Modern */
         #input-area {
-            background-color: #1c1c1e;
-            padding: 15px;
+            background-color: #121212;
+            padding: 20px;
             display: flex;
-            gap: 10px;
-            border-top: 1px solid #333;
-            /* iPhone alt bar uyumu */
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+            gap: 12px;
+            border-top: 1px solid #222;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
         }
 
         input {
             flex: 1;
-            background-color: #2c2c2e;
-            border: 1px solid #444;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
             color: white;
-            padding: 12px;
-            border-radius: 25px;
-            font-size: 16px !important; /* Zoom engelleme için şart */
+            padding: 14px 20px;
+            border-radius: 30px;
+            font-size: 16px !important;
             outline: none;
+            transition: border 0.3s;
         }
 
+        input:focus { border-color: var(--gold); }
+
         button {
-            background-color: #b8860b;
-            color: white;
+            background-color: var(--gold);
+            color: black;
             border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             font-weight: bold;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
 
     <div id="top-bar">
-        <div class="logo-text">Tanıksız Tarih</div>
+        <div class="logo-text">TANIKSIZ TARİH</div>
         <div class="social-links">
-            <a href="https://www.youtube.com/@taniksiztarih" target="_blank" title="YouTube">
-                <i class="fab fa-youtube"></i>
-            </a>
-            <a href="https://www.etsy.com/shop/anatoliacrafts" target="_blank" title="Etsy">
-                <i class="fab fa-etsy"></i>
-            </a>
+            <a href="https://www.youtube.com/@taniksiztarih" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.etsy.com/shop/anatoliacrafts" target="_blank"><i class="fab fa-etsy"></i></a>
         </div>
     </div>
 
-    <div id="chat-container">
-        <div class="message ai-message">Chronos hazır. AnatoliaCrafts'tan bir eser mi yoksa Tanıksız Tarih'ten bir sır mı sormak istersin?</div>
+    <div id="chat-container" id="scroll-area">
+        <div class="message ai-message">Zamanın derinliklerinden selamlar. Bugün hangi kadim sırrı keşfedeceğiz?</div>
     </div>
 
     <form id="input-area" onsubmit="sendMessage(event)">
-        <input type="text" id="userInput" placeholder="Tarihe fısılda..." autocomplete="off">
-        <button type="submit">Gönder</button>
+        <input type="text" id="userInput" placeholder="Tarihe bir soru sor..." autocomplete="off">
+        <button type="submit"><i class="fas fa-paper-plane"></i></button>
     </form>
 
     <script>
@@ -160,6 +182,7 @@
             inputField.value = '';
 
             try {
+                // Not: Hız için api/chat.js'de modeli 1.5-flash-8b yapmayı unutma!
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -172,7 +195,7 @@
                     chatHistory.push({ role: "model", parts: [{ text: data.reply }] });
                 }
             } catch (error) {
-                appendMessage("Zaman tüneli şu an kapalı, tekrar dene.", 'ai-message');
+                appendMessage("Bağlantı zayıfladı, tekrar dene.", 'ai-message');
             }
         }
 
@@ -182,16 +205,10 @@
             msgDiv.className = `message ${className}`;
             msgDiv.innerText = text;
             container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
         }
     </script>
 </body>
 </html>
-
-
 
 
