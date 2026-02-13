@@ -10,8 +10,7 @@
     <style>
         :root {
             --bg-color: #050a0f;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --accent-color: #d4af37; /* Logo rengine uygun altın tonu */
+            --accent-color: #d4af37;
             --text-color: #e0e0e0;
             --user-msg: #16212c;
             --ai-msg: rgba(212, 175, 55, 0.05);
@@ -32,48 +31,56 @@
         /* Header Tasarımı */
         header {
             padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(15px);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(214, 175, 55, 0.3);
+            border-bottom: 2px solid var(--accent-color);
             z-index: 10;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
-        /* Gönderdiğin logoyu buraya entegre ediyoruz */
-        .logo-img {
-            width: 50px;
-            height: 50px;
+        /* Logo Alanı - Eğer logo.jpg bulamazsa FontAwesome ikonu gösterir */
+        .logo-container {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            border: 1px solid var(--accent-color);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            overflow: hidden;
+            border: 2px solid var(--accent-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .brand h1 {
             margin: 0;
             font-family: 'Orbitron', sans-serif;
             font-size: 1.1rem;
-            letter-spacing: 2px;
-            color: #f0e68c;
-            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
 
         .social-links {
             display: flex;
-            gap: 18px;
-            align-items: center;
+            gap: 15px;
         }
 
-        /* Orijinal Logo Renkleri */
-        .fa-youtube { color: #FF0000; font-size: 22px; }
-        .fa-etsy { color: #F1641E; font-size: 18px; }
+        .fa-youtube { color: #FF0000; font-size: 24px; }
+        .fa-etsy { color: #F1641E; font-size: 20px; }
 
         /* Sohbet Alanı */
         #chat-container {
@@ -83,60 +90,50 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
         }
 
         .message {
-            max-width: 80%;
-            padding: 14px 18px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            animation: slideIn 0.3s ease-out;
+            max-width: 85%;
+            padding: 14px;
+            border-radius: 15px;
+            line-height: 1.5;
+            position: relative;
+            word-wrap: break-word;
         }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } }
 
         .user-message {
             align-self: flex-end;
             background: var(--user-msg);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom-right-radius: 4px;
         }
 
         .ai-message {
             align-self: flex-start;
             background: var(--ai-msg);
             border: 1px solid rgba(212, 175, 55, 0.2);
-            border-bottom-left-radius: 4px;
-            color: #f5f5f5;
         }
 
-        /* Üretilen Görsel Stili */
-        .generated-image {
+        /* Üretilen Görsel */
+        .gen-image {
             width: 100%;
-            max-width: 500px;
-            border-radius: 12px;
-            margin-top: 15px;
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0.3s;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
         /* Giriş Alanı */
         .input-area {
-            padding: 25px;
-            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            background: rgba(0,0,0,0.6);
         }
 
         .input-wrapper {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 25px;
             display: flex;
-            padding: 8px 15px;
-            align-items: center;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
         input {
@@ -144,49 +141,43 @@
             background: transparent;
             border: none;
             color: white;
-            padding: 12px;
+            padding: 10px;
             outline: none;
-            font-size: 0.95rem;
         }
 
         button {
-            background: transparent;
+            background: none;
             border: none;
             color: var(--accent-color);
+            font-size: 1.2rem;
             cursor: pointer;
-            font-size: 1.3rem;
-            transition: 0.2s;
         }
 
-        button:hover { transform: scale(1.1); color: white; }
-
-        /* Yükleniyor Efekti */
-        .typing { font-style: italic; opacity: 0.6; font-size: 0.8rem; }
+        .loading-text { font-size: 0.8rem; color: var(--accent-color); font-style: italic; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="brand">
-            <img src="https://raw.githubusercontent.com/AnatoliaCrafts/assets/main/channels4_profile.jpg" alt="Logo" class="logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3503/3503940.png'">
-            <h1>Tanıksız Tarih</h1>
+            <div class="logo-container">
+                <img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.src='https://img.icons8.com/ios-filled/100/d4af37/shield.png'">
+            </div>
+            <h1>TANIKSIZ TARİH</h1>
         </div>
         <div class="social-links">
-            <a href="https://youtube.com/@taniksiztarih" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-            <a href="https://etsy.com/shop/anatoliacrafts" target="_blank" title="Etsy"><i class="fab fa-etsy"></i></a>
+            <a href="https://youtube.com/@taniksiztarih" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="https://etsy.com/shop/anatoliacrafts" target="_blank"><i class="fab fa-etsy"></i></a>
         </div>
     </header>
 
     <div id="chat-container">
-        <div class="message ai-message">
-            Tarih tüneline hoş geldin. Bugün hangi savaşın stratejisini veya hangi kahramanın hikayesini merak ediyorsun? <br><br>
-            <i>İpucu: "Bana [olay] görseli oluştur" dersen senin için resmedebilirim.</i>
-        </div>
+        <div class="message ai-message">Tarih tüneline hoş geldin. Bana bir olay sor veya "Savaş görseli oluştur" de!</div>
     </div>
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="user-input" placeholder="Tarihe bir soru sor veya görsel iste..." autocomplete="off" onkeypress="if(event.key==='Enter') sendMessage()">
+            <input type="text" id="user-input" placeholder="Bir şeyler yaz..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -196,71 +187,66 @@
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
+            const message = input.value.trim();
+            if(!message) return;
 
-            appendMessage('user', text);
+            appendMessage('user', message);
             input.value = '';
 
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message ai-message typing';
-            typingDiv.innerText = 'Tarih tozları aralanıyor...';
-            document.getElementById('chat-container').appendChild(typingDiv);
+            const loadingId = "loading-" + Date.now();
+            appendMessage('ai', "Zamanın tozları aralanıyor...", loadingId);
 
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, history: chatHistory })
+                    body: JSON.stringify({ message, history: chatHistory })
                 });
                 
                 const data = await response.json();
-                typingDiv.remove();
-                
-                let aiReply = data.reply;
+                document.getElementById(loadingId).remove();
 
-                // GÖRSEL TETİKLEYİCİ KONTROLÜ
-                const imageMatch = aiReply.match(/\[IMAGE: (.*?)\]/);
+                let aiReply = data.reply;
                 
-                if (imageMatch) {
-                    const prompt = imageMatch[1];
-                    aiReply = aiReply.replace(imageMatch[0], ''); 
-                    appendMessage('model', aiReply);
-                    generateImage(prompt);
+                // GÖRSEL KONTROLÜ
+                // Kullanıcı "görsel" kelimesini kullandıysa veya Gemini [IMAGE:] kodu gönderdiyse
+                if (message.toLowerCase().includes("görsel") || message.toLowerCase().includes("resim") || aiReply.includes("[IMAGE:")) {
+                    const prompt = aiReply.match(/\[IMAGE: (.*?)\]/) ? aiReply.match(/\[IMAGE: (.*?)\]/)[1] : message;
+                    aiReply = aiReply.replace(/\[IMAGE: .*?\]/g, ""); // Kodu temizle
+                    appendMessage('ai', aiReply);
+                    displayGeneratedImage(prompt);
                 } else {
-                    appendMessage('model', aiReply);
+                    appendMessage('ai', aiReply);
                 }
 
-                chatHistory.push({ role: 'user', parts: [{ text: text }] });
-                chatHistory.push({ role: 'model', parts: [{ text: data.reply }] });
+                chatHistory.push({role: "user", parts: [{text: message}]});
+                chatHistory.push({role: "model", parts: [{text: data.reply}]});
 
             } catch (err) {
-                typingDiv.remove();
-                appendMessage('model', "Bağlantı tünelinde bir çökme oldu.");
+                document.getElementById(loadingId).innerText = "Bağlantı koptu.";
             }
         }
 
-        function appendMessage(role, text) {
+        function appendMessage(role, text, id = "") {
             const container = document.getElementById('chat-container');
             const div = document.createElement('div');
-            div.className = `message ${role}-message`;
+            div.className = `message ${role === 'user' ? 'user-message' : 'ai-message'}`;
+            if(id) div.id = id;
             div.innerText = text;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
 
-        function generateImage(prompt) {
+        function displayGeneratedImage(prompt) {
             const container = document.getElementById('chat-container');
             const img = document.createElement('img');
-            img.className = 'generated-image';
-            // Yüksek kaliteli tarihi görsel promptu
-            const fullPrompt = encodeURIComponent(`Masterpiece, historical, ${prompt}, realistic, hyper-detailed, cinematic lighting, 4k`);
-            
-            img.src = `https://image.pollinations.ai/prompt/${fullPrompt}?width=1024&height=1024&nologo=true`;
-            
-            img.onload = () => { container.scrollTop = container.scrollHeight; };
+            img.className = 'gen-image';
+            const seed = Math.floor(Math.random() * 1000);
+            img.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + " historical realistic cinematic") }?width=1024&height=1024&nologo=true&seed=${seed}`;
             container.appendChild(img);
+            img.onload = () => container.scrollTop = container.scrollHeight;
         }
     </script>
 </body>
 </html>
+   
