@@ -13,7 +13,7 @@
             --accent-color: #d4af37;
             --text-color: #e0e0e0;
             --user-msg: #16212c;
-            --ai-msg: rgba(212, 175, 55, 0.05);
+            --ai-msg: rgba(212, 175, 55, 0.08);
         }
 
         body {
@@ -28,35 +28,35 @@
             overflow: hidden;
         }
 
-        /* Header Tasarımı */
+        /* Header - YouTube Banner Tarzı */
         header {
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.85);
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(15px);
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--accent-color);
             z-index: 10;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
-        /* Logo Alanı - Eğer logo.jpg bulamazsa FontAwesome ikonu gösterir */
         .logo-container {
-            width: 45px;
-            height: 45px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             overflow: hidden;
             border: 2px solid var(--accent-color);
+            background: #000;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #000;
         }
 
         .logo-img {
@@ -68,19 +68,20 @@
         .brand h1 {
             margin: 0;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            letter-spacing: 1.5px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
             color: #fff;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            text-transform: uppercase;
         }
 
         .social-links {
             display: flex;
-            gap: 15px;
+            gap: 20px;
+            align-items: center;
         }
 
-        .fa-youtube { color: #FF0000; font-size: 24px; }
-        .fa-etsy { color: #F1641E; font-size: 20px; }
+        .fa-youtube { color: #FF0000; font-size: 26px; }
+        .fa-etsy { color: #F1641E; font-size: 22px; }
 
         /* Sohbet Alanı */
         #chat-container {
@@ -90,50 +91,58 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
         }
 
         .message {
             max-width: 85%;
-            padding: 14px;
-            border-radius: 15px;
-            line-height: 1.5;
-            position: relative;
-            word-wrap: break-word;
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease;
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
 
         .user-message {
             align-self: flex-end;
             background: var(--user-msg);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-right-radius: 4px;
         }
 
         .ai-message {
             align-self: flex-start;
             background: var(--ai-msg);
             border: 1px solid rgba(212, 175, 55, 0.2);
+            border-bottom-left-radius: 4px;
         }
 
-        /* Üretilen Görsel */
+        /* Üretilen Görsel Tasarımı */
         .gen-image {
             width: 100%;
-            border-radius: 10px;
-            margin-top: 10px;
-            border: 1px solid var(--accent-color);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            max-width: 500px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: block;
         }
 
         /* Giriş Alanı */
         .input-area {
             padding: 20px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.7);
         }
 
         .input-wrapper {
-            background: rgba(255,255,255,0.05);
-            border-radius: 25px;
-            display: flex;
-            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 30px;
+            display: flex;
+            padding: 6px 18px;
+            align-items: center;
         }
 
         input {
@@ -141,19 +150,21 @@
             background: transparent;
             border: none;
             color: white;
-            padding: 10px;
+            padding: 12px;
             outline: none;
+            font-size: 1rem;
         }
 
         button {
             background: none;
             border: none;
             color: var(--accent-color);
-            font-size: 1.2rem;
             cursor: pointer;
+            font-size: 1.4rem;
+            transition: 0.2s;
         }
 
-        .loading-text { font-size: 0.8rem; color: var(--accent-color); font-style: italic; }
+        button:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -163,7 +174,7 @@
             <div class="logo-container">
                 <img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.src='https://img.icons8.com/ios-filled/100/d4af37/shield.png'">
             </div>
-            <h1>TANIKSIZ TARİH</h1>
+            <h1>Tanıksız Tarih</h1>
         </div>
         <div class="social-links">
             <a href="https://youtube.com/@taniksiztarih" target="_blank"><i class="fab fa-youtube"></i></a>
@@ -172,12 +183,14 @@
     </header>
 
     <div id="chat-container">
-        <div class="message ai-message">Tarih tüneline hoş geldin. Bana bir olay sor veya "Savaş görseli oluştur" de!</div>
+        <div class="message ai-message">
+            Tarih yolculuğuna hoş geldin. Bir olay anlatmamı isteyebilir veya "Savaş görseli çiz" diyerek o anı canlandırmamı isteyebilirsin. 🏛️⚔️
+        </div>
     </div>
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="user-input" placeholder="Bir şeyler yaz..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <input type="text" id="user-input" placeholder="Tarihe bir soru sor veya görsel iste..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -193,8 +206,12 @@
             appendMessage('user', message);
             input.value = '';
 
-            const loadingId = "loading-" + Date.now();
-            appendMessage('ai', "Zamanın tozları aralanıyor...", loadingId);
+            const loadingId = "load-" + Date.now();
+            appendMessage('ai', "Zaman tüneli taranıyor...", loadingId);
+
+            // Görsel kelime kontrolü
+            const gorselKeywords = ["görsel", "resim", "çiz", "fotoğraf", "göster", "image", "çizermisin"];
+            const isImageRequest = gorselKeywords.some(word => message.toLowerCase().includes(word));
 
             try {
                 const response = await fetch('/api/chat', {
@@ -206,24 +223,19 @@
                 const data = await response.json();
                 document.getElementById(loadingId).remove();
 
-                let aiReply = data.reply;
-                
-                // GÖRSEL KONTROLÜ
-                // Kullanıcı "görsel" kelimesini kullandıysa veya Gemini [IMAGE:] kodu gönderdiyse
-                if (message.toLowerCase().includes("görsel") || message.toLowerCase().includes("resim") || aiReply.includes("[IMAGE:")) {
-                    const prompt = aiReply.match(/\[IMAGE: (.*?)\]/) ? aiReply.match(/\[IMAGE: (.*?)\]/)[1] : message;
-                    aiReply = aiReply.replace(/\[IMAGE: .*?\]/g, ""); // Kodu temizle
-                    appendMessage('ai', aiReply);
-                    displayGeneratedImage(prompt);
-                } else {
-                    appendMessage('ai', aiReply);
+                // Metin cevabını yaz
+                appendMessage('ai', data.reply);
+
+                // Eğer görsel istendiyse resmi bas
+                if (isImageRequest) {
+                    createImage(message);
                 }
 
                 chatHistory.push({role: "user", parts: [{text: message}]});
                 chatHistory.push({role: "model", parts: [{text: data.reply}]});
 
             } catch (err) {
-                document.getElementById(loadingId).innerText = "Bağlantı koptu.";
+                document.getElementById(loadingId).innerText = "Bağlantı kesildi, tekrar deneyin.";
             }
         }
 
@@ -237,16 +249,20 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        function displayGeneratedImage(prompt) {
+        function createImage(prompt) {
             const container = document.getElementById('chat-container');
             const img = document.createElement('img');
             img.className = 'gen-image';
-            const seed = Math.floor(Math.random() * 1000);
-            img.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + " historical realistic cinematic") }?width=1024&height=1024&nologo=true&seed=${seed}`;
-            container.appendChild(img);
+            
+            // Tarihi atmosfer katmak için promptu güçlendiriyoruz
+            const enhancedPrompt = encodeURIComponent(prompt + " realistic historical cinematic 4k, epic lighting, atmospheric");
+            const seed = Math.floor(Math.random() * 99999);
+            
+            img.src = `https://image.pollinations.ai/prompt/${enhancedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}`;
+            
             img.onload = () => container.scrollTop = container.scrollHeight;
+            container.appendChild(img);
         }
     </script>
 </body>
 </html>
-   
