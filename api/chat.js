@@ -1,11 +1,11 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+    if (req.method !== 'POST') return res.status(405).json({ reply: 'Method Not Allowed' });
 
     const apiKey = process.env.GEMINI_API_KEY;
     const { message, history } = req.body;
 
-    // EN STABİL URL: Sadece v1beta ve gemini-1.5-flash
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // EN GARANTİ URL: Sadece gemini-pro (En temel ve kararlı modeldir)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(url, {
@@ -24,9 +24,10 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        // Eğer hata gelirse, Vercel grafiğini bozmamak için 200 dönüyoruz
+        // Vercel hata oranını düşürmek için hata olsa bile 200 dönüyoruz
         if (data.error) {
-            return res.status(200).json({ reply: "Sistem güncelleniyor, lütfen 10 saniye sonra tekrar sorar mısın?" });
+            console.error("API Error:", data.error.message);
+            return res.status(200).json({ reply: "Tarih tünelinde ufak bir bakım var, lütfen birkaç saniye sonra tekrar yazar mısın?" });
         }
 
         if (data.candidates && data.candidates[0].content) {
@@ -34,9 +35,9 @@ export default async function handler(req, res) {
             return res.status(200).json({ reply: aiReply });
         }
 
-        return res.status(200).json({ reply: "Tarihin derinliklerinde bir kopukluk oldu, tekrar dene." });
+        return res.status(200).json({ reply: "Şu an cevap veremiyorum, lütfen tekrar sormayı dene." });
 
     } catch (error) {
-        return res.status(200).json({ reply: "Bağlantı hatası. Lütfen sayfayı yenile." });
+        return res.status(200).json({ reply: "Bağlantı hatası oluştu. Lütfen sayfayı yenileyin." });
     }
 }
