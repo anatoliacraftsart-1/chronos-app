@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tanıksız Tarih - AnatoliaCrafts</title>
+    <title>Tanıksız Tarih</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
             --bg-color: #050a0f;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --accent-color: #00d2ff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --accent-color: #d4af37; /* Logo rengine uygun altın tonu */
             --text-color: #e0e0e0;
-            --user-msg: #1a2a3a;
-            --ai-msg: rgba(0, 210, 255, 0.1);
+            --user-msg: #16212c;
+            --ai-msg: rgba(212, 175, 55, 0.05);
         }
 
         body {
             background: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 50%, #102030 0%, #050a0f 100%);
+            background-image: radial-gradient(circle at 50% 50%, #0d161f 0%, #050a0f 100%);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -31,59 +31,49 @@
 
         /* Header Tasarımı */
         header {
-            padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+            border-bottom: 1px solid rgba(214, 175, 55, 0.3);
             z-index: 10;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
+        /* Gönderdiğin logoyu buraya entegre ediyoruz */
         .logo-img {
-            width: 40px;
-            height: 40px;
-            filter: drop-shadow(0 0 5px var(--accent-color));
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
         }
 
-        .brand-text h1 {
+        .brand h1 {
             margin: 0;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-            color: white;
-        }
-
-        .brand-text p {
-            margin: 0;
-            font-size: 0.7rem;
-            color: var(--accent-color);
-            opacity: 0.8;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            color: #f0e68c;
+            text-transform: uppercase;
         }
 
         .social-links {
             display: flex;
-            gap: 15px;
+            gap: 18px;
             align-items: center;
         }
 
-        .social-links a {
-            text-decoration: none;
-            transition: transform 0.2s;
-        }
-
-        .social-links a:hover { transform: scale(1.1); }
-
-        /* YouTube Kırmızı, Etsy Turuncu */
-        .fa-youtube { color: #FF0000; font-size: 24px; }
-        .fa-etsy { color: #F1641E; font-size: 20px; }
+        /* Orijinal Logo Renkleri */
+        .fa-youtube { color: #FF0000; font-size: 22px; }
+        .fa-etsy { color: #F1641E; font-size: 18px; }
 
         /* Sohbet Alanı */
         #chat-container {
@@ -92,69 +82,61 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
             background: url('https://www.transparenttextures.com/patterns/stardust.png');
         }
 
         .message {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 15px;
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 18px;
             font-size: 0.95rem;
-            line-height: 1.5;
-            position: relative;
-            animation: fadeIn 0.3s ease;
+            line-height: 1.6;
+            animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } }
 
         .user-message {
             align-self: flex-end;
             background: var(--user-msg);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom-right-radius: 2px;
+            border-bottom-right-radius: 4px;
         }
 
         .ai-message {
             align-self: flex-start;
             background: var(--ai-msg);
-            border: 1px solid rgba(0, 210, 255, 0.2);
-            border-bottom-left-radius: 2px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-bottom-left-radius: 4px;
+            color: #f5f5f5;
         }
 
-        /* Görsel Kartları (Savaş Görselleri için) */
-        .image-gallery {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 10px 0;
-            scrollbar-width: none;
-        }
-        
-        .history-image {
-            width: 150px;
-            height: 100px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid rgba(0, 210, 255, 0.3);
+        /* Üretilen Görsel Stili */
+        .generated-image {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
         }
 
         /* Giriş Alanı */
         .input-area {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.4);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .input-wrapper {
-            background: var(--glass-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 15px;
             display: flex;
-            padding: 5px 15px;
+            padding: 8px 15px;
             align-items: center;
-            backdrop-filter: blur(5px);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
         }
 
         input {
@@ -164,44 +146,47 @@
             color: white;
             padding: 12px;
             outline: none;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         button {
-            background: none;
+            background: transparent;
             border: none;
             color: var(--accent-color);
             cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0 10px;
+            font-size: 1.3rem;
+            transition: 0.2s;
         }
+
+        button:hover { transform: scale(1.1); color: white; }
+
+        /* Yükleniyor Efekti */
+        .typing { font-style: italic; opacity: 0.6; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="brand">
-            <img src="https://raw.githubusercontent.com/AnatoliaCrafts/assets/main/logo.png" alt="Logo" class="logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3503/3503940.png'">
-            <div class="brand-text">
-                <h1>Tanıksız Tarih</h1>
-                <p>AnatoliaCrafts</p>
-            </div>
+            <img src="https://raw.githubusercontent.com/AnatoliaCrafts/assets/main/channels4_profile.jpg" alt="Logo" class="logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3503/3503940.png'">
+            <h1>Tanıksız Tarih</h1>
         </div>
         <div class="social-links">
-            <a href="https://youtube.com/@taniksiztarih" target="_blank"><i class="fab fa-youtube"></i></a>
-            <a href="https://etsy.com/shop/anatoliacrafts" target="_blank"><i class="fab fa-etsy"></i></a>
+            <a href="https://youtube.com/@taniksiztarih" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+            <a href="https://etsy.com/shop/anatoliacrafts" target="_blank" title="Etsy"><i class="fab fa-etsy"></i></a>
         </div>
     </header>
 
     <div id="chat-container">
         <div class="message ai-message">
-            Merhaba! Ben Tanıksız Tarih asistanı. Tarihin gizemli savaşlarını, kahramanlarını veya eski medeniyetleri keşfetmeye hazır mısın? ⚔️🏛️
+            Tarih tüneline hoş geldin. Bugün hangi savaşın stratejisini veya hangi kahramanın hikayesini merak ediyorsun? <br><br>
+            <i>İpucu: "Bana [olay] görseli oluştur" dersen senin için resmedebilirim.</i>
         </div>
     </div>
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="user-input" placeholder="Tarihe bir soru sor veya savaş görseli iste..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <input type="text" id="user-input" placeholder="Tarihe bir soru sor veya görsel iste..." autocomplete="off" onkeypress="if(event.key==='Enter') sendMessage()">
             <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -211,30 +196,47 @@
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
-            const message = input.value.trim();
-            if (!message) return;
+            const text = input.value.trim();
+            if (!text) return;
 
-            // Kullanıcı mesajını ekle
-            appendMessage('user', message);
+            appendMessage('user', text);
             input.value = '';
 
-            // Görsel isteği kontrolü (Simülasyon)
-            if (message.toLowerCase().includes("görsel") || message.toLowerCase().includes("savaş")) {
-                appendImages();
-            }
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai-message typing';
+            typingDiv.innerText = 'Tarih tozları aralanıyor...';
+            document.getElementById('chat-container').appendChild(typingDiv);
 
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message, history: chatHistory })
+                    body: JSON.stringify({ message: text, history: chatHistory })
                 });
+                
                 const data = await response.json();
-                appendMessage('model', data.reply);
-                chatHistory.push({ role: 'user', parts: [{ text: message }] });
+                typingDiv.remove();
+                
+                let aiReply = data.reply;
+
+                // GÖRSEL TETİKLEYİCİ KONTROLÜ
+                const imageMatch = aiReply.match(/\[IMAGE: (.*?)\]/);
+                
+                if (imageMatch) {
+                    const prompt = imageMatch[1];
+                    aiReply = aiReply.replace(imageMatch[0], ''); 
+                    appendMessage('model', aiReply);
+                    generateImage(prompt);
+                } else {
+                    appendMessage('model', aiReply);
+                }
+
+                chatHistory.push({ role: 'user', parts: [{ text: text }] });
                 chatHistory.push({ role: 'model', parts: [{ text: data.reply }] });
+
             } catch (err) {
-                appendMessage('model', "Bağlantı hatası oluştu.");
+                typingDiv.remove();
+                appendMessage('model', "Bağlantı tünelinde bir çökme oldu.");
             }
         }
 
@@ -247,28 +249,17 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // Savaş Görselleri için Galeri Fonksiyonu
-        function appendImages() {
+        function generateImage(prompt) {
             const container = document.getElementById('chat-container');
-            const gallery = document.createElement('div');
-            gallery.className = 'image-gallery';
+            const img = document.createElement('img');
+            img.className = 'generated-image';
+            // Yüksek kaliteli tarihi görsel promptu
+            const fullPrompt = encodeURIComponent(`Masterpiece, historical, ${prompt}, realistic, hyper-detailed, cinematic lighting, 4k`);
             
-            // Örnek tarihi savaş görselleri (Unsplash/Placeholder)
-            const images = [
-                'https://images.unsplash.com/photo-1599408162145-8fbc79b5f3dd?w=300',
-                'https://images.unsplash.com/photo-1510442650500-93217e63c7af?w=300',
-                'https://images.unsplash.com/photo-1440492248262-6895a9da82ef?w=300'
-            ];
-
-            images.forEach(src => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = 'history-image';
-                gallery.appendChild(img);
-            });
-
-            container.appendChild(gallery);
-            container.scrollTop = container.scrollHeight;
+            img.src = `https://image.pollinations.ai/prompt/${fullPrompt}?width=1024&height=1024&nologo=true`;
+            
+            img.onload = () => { container.scrollTop = container.scrollHeight; };
+            container.appendChild(img);
         }
     </script>
 </body>
