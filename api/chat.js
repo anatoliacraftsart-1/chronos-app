@@ -2,11 +2,11 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(200).json({ reply: "Sistem: API Anahtarı eksik." });
+    return res.status(200).json({ reply: "Hata: API Anahtarı eksik." });
   }
 
   try {
-    // Modern 'fetch' yapısı - Kütüphane gerektirmez, hata riskini azaltır
+    // Kütüphane gerektirmeyen modern yerel fetch yapısı
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
       {
@@ -21,16 +21,16 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.error) {
-      // Kota hatası mı yoksa başka bir şey mi olduğunu net göreceğiz
+      // Eğer hala kota hatası verirse, sorun sadece Google'ın bekleme süresidir.
       return res.status(200).json({ reply: `Bilgi: ${data.error.message}` });
     }
 
     if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
       res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
     } else {
-      res.status(200).json({ reply: "Mesaj ulaştı ama yanıt boş döndü." });
+      res.status(200).json({ reply: "Sistem mesajı aldı ama yanıt oluşturamadı, lütfen 1 dakika bekleyip tekrar deneyin." });
     }
   } catch (error) {
-    res.status(500).json({ reply: "Bağlantı tünelinde teknik bir aksama oldu." });
+    res.status(500).json({ reply: "Bağlantı tünelinde bir aksama oldu." });
   }
 }
